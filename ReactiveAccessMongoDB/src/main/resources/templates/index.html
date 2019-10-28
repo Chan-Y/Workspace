@@ -1,10 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Spring Boot with MongoDB : Singers</title>
+    <link rel="stylesheet" href="/main.css" />
 </head>
 <body>
-$END$
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Avatar</th>
+                    <th>Albums</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="singer : ${singers}">
+                    <td th:text="${singer.id}" />
+                    <td th:text="${singer.firstName}" />
+                    <td th:text="${singer.lastName}" />
+                    <td>
+                        <a th:href="@{'/images/avatar/' + ${singer.avatar.name}}">
+                            <img th:src="@{'/images/avatar/' + ${singer.avatar.name}}" class="thumbnail" />
+                        </a>
+                    </td>
+                    <td>
+                        <form method="get" action="/showAlbums">
+                            <p><input type="button" value="Check Albums" /> </p>
+                        </form>
+                    </td>
+                    <td>
+                        <form th:method="post" th:action="@{'/singer/' + ${singer.id}}">
+<!--                         modelAttribute="singer"              th:name="@{singer}"               -->
+                            <input type="submit" value="Delete" />
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
