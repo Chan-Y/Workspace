@@ -71,18 +71,14 @@ public class SingerService {
 
         //delete file - Avatar
         Mono<Object> deleteAvatar = Mono.fromRunnable( () -> {
-
-                System.out.println("SingerService.deleteSinger.deleteAvatar");
-                singerRepository.findById(id).subscribe(v -> {
-                    System.out.println(v.getAvatar().getName());
-                    try {
-                        Files.deleteIfExists(Paths.get(UPLOAD_ROOT + "/avatar/", v.getAvatar().getName()));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-//                singerRepository.findById(id).subscribe(v -> System.out.println(v.getAvatar().getName()));
-
+//            singerRepository.findById(id).subscribe(v -> System.out.println(v.getAvatar().getName()));
+            singerRepository.findById(id).subscribe(v -> {
+                try {
+                    Files.deleteIfExists(Paths.get(UPLOAD_ROOT + "/avatar/", v.getAvatar().getName()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
         }).log("SingerService.deleteSinger-deleteAvatar");
 //
