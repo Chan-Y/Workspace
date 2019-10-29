@@ -6,7 +6,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Document
 public class Singer {
@@ -22,7 +24,17 @@ public class Singer {
     private String role = "singer";
 
     public Singer() {
-        super();
+        this.id = UUID.randomUUID().toString();
+        this.avatar = new Image();
+        this.albums = new ArrayList<Image>();
+    }
+
+    public Singer(String firstName, String lastName) {
+        this.id = UUID.randomUUID().toString();
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.avatar = new Image();
+        this.albums = new ArrayList<Image>();
     }
 
     public Singer(String id, String firstName, String lastName, Image avatar, List<Image> albums) {

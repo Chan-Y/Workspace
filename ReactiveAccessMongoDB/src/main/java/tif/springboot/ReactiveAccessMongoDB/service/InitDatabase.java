@@ -33,8 +33,8 @@ public class InitDatabase {
           albumsTS.add(imageRED);
 
           List albumsKP= new ArrayList<Image>();
-          albumsTS.add(imagePrism);
-          albumsTS.add(imageRise);
+          albumsKP.add(imagePrism);
+          albumsKP.add(imageRise);
 
 
 //          operations.insert(image1989);

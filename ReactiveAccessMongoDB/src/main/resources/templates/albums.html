@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Albums</title>
+    <link rel="stylesheet" href="/main.css" />
+</head>
+<body>
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Cover</th>
+                    <th></th>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr th:each="album : ${singer.albums}">
+                    <td th:text="${album.name}" />
+                    <td>
+                        <a th:href="@{'/images/album/' + ${album.name}}">
+                            <img th:src="@{'/images/album/' + ${album.name}}" class="thumbnail" />
+                        </a>
+                    </td>
+                </tr>
+
+
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

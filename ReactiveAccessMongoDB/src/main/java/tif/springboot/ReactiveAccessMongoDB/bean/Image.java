@@ -3,6 +3,8 @@ package tif.springboot.ReactiveAccessMongoDB.bean;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.UUID;
+
 @Document
 public class Image {
 
@@ -12,7 +14,13 @@ public class Image {
     private String type;
 
     public Image(){
-        super();
+        this.id = UUID.randomUUID().toString();
+    }
+
+    public Image(String name, String type){
+        this.id = UUID.randomUUID().toString();
+        this.name = name;
+        this.type = type;
     }
 
     public Image(String id, String name, String type) {
