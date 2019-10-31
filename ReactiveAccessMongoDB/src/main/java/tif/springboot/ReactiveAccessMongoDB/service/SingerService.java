@@ -73,16 +73,20 @@ public class SingerService {
 
         }).log("SingerService.deleteSinger-deleteAvatar");
 
-//        //should invoke  function
+//        //should invoke deleteAlbum function
 //        Flux<Object> deleteAlbums;
-//
+//CODE HERE ------------------------------------------
+
 
         //Not interested in the results, so append a then()
-        return Mono.when(deleteDatabaseSinger, deleteAvatar)  //, deleteAlbums);
+        return Mono.when(deleteAvatar)  //, deleteAlbums);
                     .log("SingerService.deleteSinger-when")
-                    .then()
+                //Q: deleteAvatar and deleteAlbums need to invoke singerRepository.findById(id)
+                //Q: not sure if database deleted first, would it effect another 2 functions
+                    .then(deleteDatabaseSinger)
                     .log("SingerService.deleteSinger-done");
     }
+
 
 
     /*
@@ -114,6 +118,8 @@ public class SingerService {
 
     }
 
+
+
     /*
      * Find all albums
      *
@@ -122,11 +128,48 @@ public class SingerService {
        return singerRepository.findById(id).log("SingerSerivce.findSingerById");
     }
 
+
+
     /*
      * Display a image (album)
      */
     public Mono<Resource> findOneAlbum(String filename){
         return Mono.fromSupplier(()-> resourceLoader.getResource("file:" + UPLOAD_ROOT + "/album/" + filename))
-                .log("SingerServer.findOneAvatar");
+                .log("SingerServer.findOneAlbum");
+    }
+
+
+
+    /*
+     * Delete a album
+     *
+     */
+    public Mono<Void> deleteAlbum(String singerId, String albumName) {
+
+        Mono<Void> deleteDBAlbum = singerRepository.findById(singerId)
+                                                    .log("deleteDBAlbum-findBySingerId")
+                                                    .flatMap(singer ->{
+                                                        singer.getAlbums().removeIf(a->a.getName().equals(albumName));
+                                                        singerRepository.deleteById(singerId);
+                                                        singerRepository.save(singer);
+                                                        return null;
+                                                    });
+
+
+        //Works
+        Mono<Object> deleteFile = Mono.fromRunnable(()->{
+            try {
+                Files.deleteIfExists(Paths.get(UPLOAD_ROOT + "/album/", albumName));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        })
+                .log("deleteImage-file");
+
+
+        return Mono.when( deleteFile, deleteDBAlbum)
+                    .log("deleteAlbum-when")
+                    .then()
+                    .log("deleteAlbum-done");
     }
 }

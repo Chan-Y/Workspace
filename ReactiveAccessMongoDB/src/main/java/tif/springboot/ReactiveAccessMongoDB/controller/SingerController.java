@@ -22,7 +22,7 @@ public class SingerController {
     private static final String IMAGE_BASE_PATH = "images";
     private static final String ALBUM_BASE_PATH = "albums";
     private static final String FILENAME = "{filename:.+}";
-    private static final String SINGER_ID = "{id:.+}";
+    private static final String ID = "{id:.+}";
 
     private SingerService singerService;
 
@@ -31,16 +31,21 @@ public class SingerController {
     }
 
 
+    /*
+     * Displaying the list of singers ------ index.html
+     */
     @GetMapping("/")
-    public Mono<String> index(Model model){
+    public Mono<String> showSinger(Model model){
         //Object singers: contents all Singer objects find from MongoDB
         model.addAttribute("singers", singerService.findAllSingers());
 
         //Object singer: contents a single Singer object, preparing for the addASinger function
         model.addAttribute("newSinger", new Singer());
 
-        return Mono.just("index");
+        return Mono.just("index");  //index.html
     }
+
+
 
     /*
      * Handler for displaying a single image on the web page
@@ -65,11 +70,10 @@ public class SingerController {
     /*
      * Delete a singer
      */
-    @RequestMapping(method = RequestMethod.POST, value=SINGER_BASE_PATH + "/" + SINGER_ID)
-    public Mono<String> deleteFile(@PathVariable String id){
+    @RequestMapping(method = RequestMethod.POST, value=SINGER_BASE_PATH + "/" + ID)
+    public Mono<String> deleteSinger(@PathVariable String id){
         return singerService.deleteSinger(id).then(Mono.just("redirect:/"));
     }
-
 
 
 
@@ -92,21 +96,28 @@ public class SingerController {
     }
 
 
+
     /*
      * Display list of albums by SINGER_ID
+     * method = RequestMethod.POST,
      */
-    @RequestMapping(method = RequestMethod.POST, value = ALBUM_BASE_PATH + "/" + SINGER_ID )
-    public Mono<String> showAlbums(@PathVariable String id, Model model){
-
-        model.addAttribute("singer", singerService.findSingerById(id));
-
-//        model.addAttribute("newAlbum", new Image());
+    @RequestMapping( value = ALBUM_BASE_PATH + "/" + ID)
+    public Mono<String> showAlbums(@PathVariable(value = "id") String singerId, Model model){
+        //Passing the {singer.id} to albums.html to display {singer.albums.name}
+        model.addAttribute("singer", singerService.findSingerById(singerId));
+        //Passing a new Image object to content the new album
+        model.addAttribute("newAlbum", new Image());
 
         return Mono.just("albums");
+        //Mono.just("albums") redirect view to albums.html
+        //Mono.just("redirect:/" + ALBUM_BASE_PATH + "/" + singerId) redirect view to this method showAlbums
+
     }
 
+
+
     /*
-     * Handler for displaying a single album on the web page
+     * Displaying a single album on the web page
      */
     @GetMapping(value = IMAGE_BASE_PATH + "/album/" + FILENAME,produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody
@@ -121,6 +132,24 @@ public class SingerController {
                         return ResponseEntity.badRequest().body("Couldn't find " + filename + " => " + e.getMessage());
                     }
                 });
+    }
+
+
+
+    /*
+     * Delete a album
+     *
+     */
+    @RequestMapping(method = RequestMethod.POST, value=ALBUM_BASE_PATH + "/" + ID + "/" + FILENAME)
+    public Mono<String> deleteAlbum(@PathVariable(value = "id") String singerId, @PathVariable(value = "filename") String albumName, Model model){
+        System.out.println(singerId + "/" + albumName);
+        return singerService.deleteAlbum(singerId, albumName).then(Mono.just("redirect:/" + ALBUM_BASE_PATH + "/" + singerId));
+
+
+
+        //return Mono.just("/albums/" + singerId);
+        //return singerService.deleteAlbum(singerId, albumName).then(Mono.just("/albums/" + singerId)); //albums.html
+
     }
 
 

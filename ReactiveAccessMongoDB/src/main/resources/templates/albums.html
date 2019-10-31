@@ -24,9 +24,12 @@
                             <img th:src="@{'/images/album/' + ${album.name}}" class="thumbnail" />
                         </a>
                     </td>
+                    <td>
+                        <form th:method="post" th:action="@{'/albums/'+ ${singer.id} + '/' + ${album.name}}">
+                            <input type="submit" value="Delete" />
+                        </form>
+                    </td>
                 </tr>
-
-
             </tbody>
         </table>
     </div>
