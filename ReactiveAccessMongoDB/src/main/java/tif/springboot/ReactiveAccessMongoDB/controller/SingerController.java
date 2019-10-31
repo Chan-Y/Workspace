@@ -141,9 +141,10 @@ public class SingerController {
      *
      */
     @RequestMapping(method = RequestMethod.POST, value=ALBUM_BASE_PATH + "/" + ID + "/" + FILENAME)
-    public Mono<String> deleteAlbum(@PathVariable(value = "id") String singerId, @PathVariable(value = "filename") String albumName, Model model){
+    public Mono<String> deleteAlbum(@PathVariable(value = "id") String singerId, @PathVariable(value = "filename") String albumName){  //, Model model
         System.out.println(singerId + "/" + albumName);
-        return singerService.deleteAlbum(singerId, albumName).then(Mono.just("redirect:/" + ALBUM_BASE_PATH + "/" + singerId));
+        //return singerService.deleteAlbum(singerId, albumName).then(Mono.just("redirect:/" + ALBUM_BASE_PATH + "/" + singerId));
+        return singerService.deleteAlbum(singerId, albumName).then(Mono.just("redirect:/"));
 
 
 

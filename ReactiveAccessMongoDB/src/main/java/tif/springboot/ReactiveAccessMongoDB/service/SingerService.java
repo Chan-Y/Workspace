@@ -146,18 +146,20 @@ public class SingerService {
      */
     public Mono<Void> deleteAlbum(String singerId, String albumName) {
 
-        Mono<Void> deleteDBAlbum = singerRepository.findById(singerId)
-                                                    .log("deleteDBAlbum-findBySingerId")
-                                                    .flatMap(singer ->{
-                                                        singer.getAlbums().removeIf(a->a.getName().equals(albumName));
-                                                        singerRepository.deleteById(singerId);
-                                                        singerRepository.save(singer);
-                                                        return null;
-                                                    });
-
-
-        //Works
         Mono<Object> deleteFile = Mono.fromRunnable(()->{
+            //Delete DB not working
+            singerRepository.findById(singerId).subscribe(singer -> {
+                singerRepository.deleteById(singerId);
+                if(singer.getAlbums().removeIf(a->a.getName().equals(albumName))){
+                    System.out.println("Delete Singer: " + singerId + "---------------------------------------------------------------------");
+                    Singer newS = new Singer(singer.getId(), singer.getFirstName(), singer.getLastName(), singer.getAvatar(), singer.getAlbums());
+                    System.out.println(newS.toString());
+//                singerRepository.save(newS);
+                };
+
+            });
+
+            //Delete File Works
             try {
                 Files.deleteIfExists(Paths.get(UPLOAD_ROOT + "/album/", albumName));
             } catch (IOException e) {
@@ -167,7 +169,7 @@ public class SingerService {
                 .log("deleteImage-file");
 
 
-        return Mono.when( deleteFile, deleteDBAlbum)
+        return Mono.when( deleteFile)
                     .log("deleteAlbum-when")
                     .then()
                     .log("deleteAlbum-done");
